@@ -1,17 +1,18 @@
 using CustomLogger;
+using Microsoft.Extensions.Logging;
+using MultiServerLibrary;
 using MultiServerLibrary.GeoLocalization;
+using MultiServerLibrary.SNMP;
 using MultiSpy.Data;
 using MultiSpy.Servers;
+using System.Diagnostics;
 using System.Net;
 using System.Reflection;
 using System.Runtime;
 using System.Runtime.InteropServices;
-using System.Text.Json.Nodes;
-using System.Text.Json;
-using MultiServerLibrary.SNMP;
-using MultiServerLibrary;
-using Microsoft.Extensions.Logging;
 using System.Runtime.Loader;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 public static class MultiSpyServerConfiguration
 {
@@ -4927,7 +4928,19 @@ class Program
         if (!MultiServerLibrary.Extension.Microsoft.Win32API.IsWindows)
             GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
         else
-            TechnitiumLibrary.Net.Firewall.FirewallHelper.CheckFirewallEntries(Assembly.GetEntryAssembly()?.Location);
+        {
+            TechnitiumLibrary.Net.Firewall.FirewallHelper.CheckFirewallEntries(Process.GetCurrentProcess().MainModule.FileName,
+                new Dictionary<int, TechnitiumLibrary.Net.Firewall.Protocol>
+                    {
+                        { 29900, TechnitiumLibrary.Net.Firewall.Protocol.TCP },
+                        { 29901, TechnitiumLibrary.Net.Firewall.Protocol.TCP },
+                        { 29910, TechnitiumLibrary.Net.Firewall.Protocol.UDP },
+                        { 27900, TechnitiumLibrary.Net.Firewall.Protocol.UDP },
+                        { 28910, TechnitiumLibrary.Net.Firewall.Protocol.TCP },
+                        { 27901, TechnitiumLibrary.Net.Firewall.Protocol.UDP },
+                        { ushort.MaxValue, TechnitiumLibrary.Net.Firewall.Protocol.TCP }
+                    });
+        }
 
         LoggerAccessor.SetupLogger("MultiSpy", Directory.GetCurrentDirectory());
 

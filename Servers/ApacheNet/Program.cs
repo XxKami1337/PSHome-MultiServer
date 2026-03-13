@@ -11,6 +11,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Reflection;
@@ -441,6 +442,18 @@ class Program
 
         if (ApacheNetServerConfiguration.Ports != null && ApacheNetServerConfiguration.Ports.Count > 0)
         {
+            if (MultiServerLibrary.Extension.Microsoft.Win32API.IsWindows)
+            {
+                var firewallEntries = new Dictionary<int, TechnitiumLibrary.Net.Firewall.Protocol>();
+
+                foreach (var port in ApacheNetServerConfiguration.Ports)
+                    firewallEntries.Add(port, TechnitiumLibrary.Net.Firewall.Protocol.TCP);
+
+                firewallEntries.Add(ushort.MaxValue, TechnitiumLibrary.Net.Firewall.Protocol.TCP);
+
+                TechnitiumLibrary.Net.Firewall.FirewallHelper.CheckFirewallEntries(Process.GetCurrentProcess().MainModule.FileName,
+                   firewallEntries);
+            }
             WarmUpThread = new Thread(WarmUpServers)
             {
                 Name = "Server Warm Up"
@@ -505,8 +518,6 @@ class Program
 
         if (!MultiServerLibrary.Extension.Microsoft.Win32API.IsWindows)
             GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
-        else
-            TechnitiumLibrary.Net.Firewall.FirewallHelper.CheckFirewallEntries(Assembly.GetEntryAssembly()?.Location);
 
         LoggerAccessor.SetupLogger("ApacheNet", Directory.GetCurrentDirectory());
 

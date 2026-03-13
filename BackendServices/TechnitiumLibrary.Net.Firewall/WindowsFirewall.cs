@@ -1,4 +1,4 @@
-/*
+﻿/*
 Technitium Library
 Copyright (C) 2021  Shreyas Zare (shreyas@technitium.com)
 
@@ -63,6 +63,7 @@ namespace TechnitiumLibrary.Net.Firewall
         Blocked = 3
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Designed for Windows Firewall")]
     public static class WindowsFirewall
     {
         public static void AddRuleVista(string name, string description = null, FirewallAction action = FirewallAction.Allow, string applicationPath = null, Protocol protocol = Protocol.IPv4, string localPorts = null, string remotePorts = null, string localAddresses = null, string remoteAddresses = null, InterfaceTypeFlags interfaceType = InterfaceTypeFlags.All, bool enable = true, Direction direction = Direction.Inbound, bool edgeTraversal = false)
@@ -157,7 +158,7 @@ namespace TechnitiumLibrary.Net.Firewall
 
             foreach (INetFwRule rule in firewallPolicy.Rules)
             {
-                if (((rule.Name != null) && rule.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) || ((rule.ApplicationName != null) && rule.ApplicationName.Equals(applicationPath, StringComparison.OrdinalIgnoreCase)))
+                if (((rule.Name == null) || string.IsNullOrEmpty(name) || rule.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) && ((rule.ApplicationName == null) || rule.ApplicationName.Equals(applicationPath, StringComparison.OrdinalIgnoreCase)))
                 {
                     if ((protocol != Protocol.Unknown) && (rule.Protocol != (int)protocol))
                         continue;

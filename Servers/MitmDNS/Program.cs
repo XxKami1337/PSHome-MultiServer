@@ -1,19 +1,21 @@
 using CustomLogger;
+using Microsoft.Extensions.Logging;
 using MitmDNS;
+using MultiServerLibrary;
+using MultiServerLibrary.CustomServers;
+using MultiServerLibrary.Extension;
+using MultiServerLibrary.SNMP;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Runtime;
 using System.Threading;
 using System.Threading.Tasks;
-using MultiServerLibrary.Extension;
-using MultiServerLibrary.SNMP;
-using MultiServerLibrary;
-using Microsoft.Extensions.Logging;
-using MultiServerLibrary.CustomServers;
-using System.Collections.Generic;
-using System.Net;
 
 public static class MitmDNSServerConfiguration
 {
@@ -231,7 +233,14 @@ class Program
         if (!MultiServerLibrary.Extension.Microsoft.Win32API.IsWindows)
             GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
         else
-            TechnitiumLibrary.Net.Firewall.FirewallHelper.CheckFirewallEntries(Assembly.GetEntryAssembly()?.Location);
+        {
+            TechnitiumLibrary.Net.Firewall.FirewallHelper.CheckFirewallEntries(Process.GetCurrentProcess().MainModule.FileName,
+                 new Dictionary<int, TechnitiumLibrary.Net.Firewall.Protocol>
+                    {
+                        { _ports.First(), TechnitiumLibrary.Net.Firewall.Protocol.UDP },
+                        { ushort.MaxValue, TechnitiumLibrary.Net.Firewall.Protocol.TCP }
+                    });
+        }
 
         LoggerAccessor.SetupLogger("MitmDNS", Directory.GetCurrentDirectory());
 

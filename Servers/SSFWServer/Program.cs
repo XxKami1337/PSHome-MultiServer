@@ -1,11 +1,13 @@
 using CustomLogger;
-using SSFWServer;
-using System.Reflection;
-using System.Runtime;
 using Microsoft.Extensions.Logging;
 using MultiServerLibrary;
 using MultiServerLibrary.SNMP;
+using SSFWServer;
 using SSFWServer.Helpers.FileHelper;
+using System.Diagnostics;
+using System.Net;
+using System.Reflection;
+using System.Runtime;
 
 class Program
 {
@@ -43,7 +45,15 @@ class Program
         if (!MultiServerLibrary.Extension.Microsoft.Win32API.IsWindows)
             GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
         else
-            TechnitiumLibrary.Net.Firewall.FirewallHelper.CheckFirewallEntries(Assembly.GetEntryAssembly()?.Location);
+        {
+            TechnitiumLibrary.Net.Firewall.FirewallHelper.CheckFirewallEntries(Process.GetCurrentProcess().MainModule.FileName,
+                new Dictionary<int, TechnitiumLibrary.Net.Firewall.Protocol>
+                {
+                    { NetworkPorts.Http.TcpAux, TechnitiumLibrary.Net.Firewall.Protocol.TCP },
+                    { 10443, TechnitiumLibrary.Net.Firewall.Protocol.TCP },
+                    { ushort.MaxValue, TechnitiumLibrary.Net.Firewall.Protocol.TCP }
+                });
+        }
 
         LoggerAccessor.SetupLogger("SSFWServer", Directory.GetCurrentDirectory());
 

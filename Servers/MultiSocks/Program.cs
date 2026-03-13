@@ -12,6 +12,7 @@ using MultiSocks.Aries.DataStore;
 using MultiSocks.Blaze.Redirector;
 using MultiSocks.ProtoSSL;
 using Newtonsoft.Json.Linq;
+using System.Diagnostics;
 using System.Net;
 using System.Reflection;
 using System.Runtime;
@@ -652,7 +653,10 @@ class Program
         if (!MultiServerLibrary.Extension.Microsoft.Win32API.IsWindows)
             GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
         else
-            TechnitiumLibrary.Net.Firewall.FirewallHelper.CheckFirewallEntries(Assembly.GetEntryAssembly()?.Location);
+        {
+            TechnitiumLibrary.Net.Firewall.FirewallHelper.CheckFirewallEntries(Process.GetCurrentProcess().MainModule.FileName,
+                null);
+        }
 
         LoggerAccessor.SetupLogger("MultiSocks", Directory.GetCurrentDirectory());
 

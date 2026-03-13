@@ -182,7 +182,19 @@ class Program
         if (!MultiServerLibrary.Extension.Microsoft.Win32API.IsWindows)
             GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
         else
-            TechnitiumLibrary.Net.Firewall.FirewallHelper.CheckFirewallEntries(Assembly.GetEntryAssembly()?.Location);
+        {
+            var firewallEntries = new Dictionary<int, TechnitiumLibrary.Net.Firewall.Protocol>();
+
+            ushort startingPort = 10058;
+
+            for (int i = 0; i < 13; i++)
+                firewallEntries.Add(startingPort + i, TechnitiumLibrary.Net.Firewall.Protocol.TCP);
+
+            firewallEntries.Add(ushort.MaxValue, TechnitiumLibrary.Net.Firewall.Protocol.TCP);
+
+            TechnitiumLibrary.Net.Firewall.FirewallHelper.CheckFirewallEntries(Process.GetCurrentProcess().MainModule.FileName,
+                firewallEntries);
+        }
 
         LoggerAccessor.SetupLogger("SVO", Directory.GetCurrentDirectory());
 

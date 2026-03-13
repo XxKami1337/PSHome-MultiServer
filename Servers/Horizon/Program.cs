@@ -1,8 +1,3 @@
-using System.Collections.Concurrent;
-using System.Net;
-using System.Reflection;
-using System.Runtime;
-using System.Security.Cryptography;
 using CustomLogger;
 using Horizon.HTTPSERVICE;
 using Horizon.LIBRARY.Database;
@@ -15,6 +10,12 @@ using MultiServerLibrary.GeoLocalization;
 using MultiServerLibrary.SNMP;
 using Newtonsoft.Json.Linq;
 using Prometheus;
+using System.Collections.Concurrent;
+using System.Diagnostics;
+using System.Net;
+using System.Reflection;
+using System.Runtime;
+using System.Security.Cryptography;
 
 public static class HorizonServerConfiguration
 {
@@ -288,7 +289,10 @@ class Program
         if (!MultiServerLibrary.Extension.Microsoft.Win32API.IsWindows)
             GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
         else
-            TechnitiumLibrary.Net.Firewall.FirewallHelper.CheckFirewallEntries(Assembly.GetEntryAssembly()?.Location);
+        {
+            TechnitiumLibrary.Net.Firewall.FirewallHelper.CheckFirewallEntries(Process.GetCurrentProcess().MainModule.FileName,
+                null);
+        }
 
         LoggerAccessor.SetupLogger("Horizon", Directory.GetCurrentDirectory());
 

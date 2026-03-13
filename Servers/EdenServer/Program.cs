@@ -8,6 +8,7 @@ using MultiServerLibrary;
 using MultiServerLibrary.Extension;
 using MultiServerLibrary.GeoLocalization;
 using MultiServerLibrary.SNMP;
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime;
 using System.Runtime.Loader;
@@ -310,7 +311,10 @@ class Program
         if (!MultiServerLibrary.Extension.Microsoft.Win32API.IsWindows)
             GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
         else
-            TechnitiumLibrary.Net.Firewall.FirewallHelper.CheckFirewallEntries(Assembly.GetEntryAssembly()?.Location);
+        {
+            TechnitiumLibrary.Net.Firewall.FirewallHelper.CheckFirewallEntries(Process.GetCurrentProcess().MainModule.FileName,
+                null);
+        }
 
         LoggerAccessor.SetupLogger(serverName, Directory.GetCurrentDirectory());
 

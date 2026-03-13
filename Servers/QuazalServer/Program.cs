@@ -7,6 +7,7 @@ using MultiServerLibrary.SNMP;
 using Newtonsoft.Json.Linq;
 using QuazalServer.QNetZ;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime;
 
@@ -330,7 +331,10 @@ class Program
         if (!MultiServerLibrary.Extension.Microsoft.Win32API.IsWindows)
             GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
         else
-            TechnitiumLibrary.Net.Firewall.FirewallHelper.CheckFirewallEntries(Assembly.GetEntryAssembly()?.Location);
+        {
+            TechnitiumLibrary.Net.Firewall.FirewallHelper.CheckFirewallEntries(Process.GetCurrentProcess().MainModule.FileName,
+                null);
+        }
 
         LoggerAccessor.SetupLogger("QuazalServer", Directory.GetCurrentDirectory());
 
