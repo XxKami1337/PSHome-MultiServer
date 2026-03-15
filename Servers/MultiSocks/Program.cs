@@ -568,20 +568,48 @@ class Program
 
                     if (config.Components != null)
                     {
+                        var assemblies = AppDomain.CurrentDomain
+                                        .GetAssemblies();
+
                         foreach (var compName in config.Components)
                         {
                             try
                             {
-                                var type = Type.GetType(compName.StartsWith(componentsClassPrefix) ? compName : componentsClassPrefix + compName, throwOnError: false);
+                                var type = Type.GetType(compName, false);
+
+                                if (type == null)
+                                {
+                                    type = assemblies
+                                        .Select(a => a.GetType(compName, false))
+                                        .FirstOrDefault(t => t != null);
+                                }
+
+                                if (type == null)
+                                {
+                                    type = assemblies
+                                        .Select(a => a.GetType(componentsClassPrefix + compName, false))
+                                        .FirstOrDefault(t => t != null);
+                                }
+
                                 if (type != null)
                                 {
-                                    blazeServer.AddComponent(type);
+                                    try
+                                    {
+                                        var method = blazeServer.GetType()
+                                            .GetMethod("AddComponent")
+                                            ?.MakeGenericMethod(type);
+
+                                        method?.Invoke(blazeServer, null);
+                                    }
+                                    catch
+                                    {
+                                        blazeServer.AddComponent(type);
+                                    }
+
                                     LoggerAccessor.LogInfo($"[{blazeVersion.ToUpper()}] Added component: {compName}");
                                 }
                                 else
-                                {
                                     LoggerAccessor.LogWarn($"[{blazeVersion.ToUpper()}] Component not found: {compName}");
-                                }
                             }
                             catch (Exception ex)
                             {
@@ -615,20 +643,48 @@ class Program
 
                     if (config.Components != null)
                     {
+                        var assemblies = AppDomain.CurrentDomain
+                                        .GetAssemblies();
+
                         foreach (var compName in config.Components)
                         {
                             try
                             {
-                                var type = Type.GetType(compName.StartsWith(componentsClassPrefix) ? compName : componentsClassPrefix + compName, throwOnError: false);
+                                var type = Type.GetType(compName, false);
+
+                                if (type == null)
+                                {
+                                    type = assemblies
+                                        .Select(a => a.GetType(compName, false))
+                                        .FirstOrDefault(t => t != null);
+                                }
+
+                                if (type == null)
+                                {
+                                    type = assemblies
+                                        .Select(a => a.GetType(componentsClassPrefix + compName, false))
+                                        .FirstOrDefault(t => t != null);
+                                }
+
                                 if (type != null)
                                 {
-                                    blazeServer.AddComponent(type);
+                                    try
+                                    {
+                                        var method = blazeServer.GetType()
+                                            .GetMethod("AddComponent")
+                                            ?.MakeGenericMethod(type);
+
+                                        method?.Invoke(blazeServer, null);
+                                    }
+                                    catch
+                                    {
+                                        blazeServer.AddComponent(type);
+                                    }
+
                                     LoggerAccessor.LogInfo($"[{blazeVersion.ToUpper()}] Added component: {compName}");
                                 }
                                 else
-                                {
                                     LoggerAccessor.LogWarn($"[{blazeVersion.ToUpper()}] Component not found: {compName}");
-                                }
                             }
                             catch (Exception ex)
                             {
