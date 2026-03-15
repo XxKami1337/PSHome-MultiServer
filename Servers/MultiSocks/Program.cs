@@ -368,7 +368,7 @@ class Program
     public static IDatabase? DirtySocksDatabase = null;
 
     private static readonly Dictionary<string, object> AriesServers = new();
-    private static readonly Dictionary<string, BlazeServer> BlazeServers = new();
+    private static readonly Dictionary<string, object> BlazeServers = new();
 
     private static readonly VulnerableCertificateGenerator BlazeSSLCache = new();
 
@@ -385,7 +385,10 @@ class Program
         }
         foreach (var server in BlazeServers.Values)
         {
-            server.Stop();
+            if (server is BlazeServer bServer)
+                bServer.Stop();
+            else
+                ((MitmBlazeServer)server).Stop();
         }
 
         GC.Collect();
