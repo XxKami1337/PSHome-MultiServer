@@ -1555,6 +1555,58 @@ namespace WebAPIService.GameServices.PSHOME.PREMIUMAGENCY
                 #endregion
 
                 #region hc_gallery
+                case "hc_gallery_main":
+                    {
+                        Directory.CreateDirectory(homecafeGalleryPath);
+                        string filePath = $"{homecafeGalleryPath}/{resKey}.xml";
+                        if (File.Exists(filePath))
+                        {
+                            LoggerAccessor.LogInfo($"[PREMIUMAGENCY] - Resource with resource key {resKey} found and sent!");
+                            string res = File.ReadAllText(filePath);
+
+                            string resourceXML = "<xml>\r\n" +
+                                "<result type=\"int\">1</result>\r\n" +
+                                "<description type=\"text\">Success</description>\r\n" +
+                                "<error_no type=\"int\">0</error_no>\r\n" +
+                                "<error_message type=\"text\">None</error_message>\r\n" +
+                                $"<key type=\"text\">{resKey}</key>\r\n" +
+                                $"{res}\r\n" +
+                                "</xml>";
+
+                            return resourceXML;
+                        }
+                        else
+                        {
+                            LoggerAccessor.LogError($"[PREMIUMAGENCY] - Failed to find resource {resKey} with expected path {filePath}!");
+                        }
+                    }
+                    break;
+                case "hc_gallery_skysetting":
+                    {
+                        Directory.CreateDirectory(homecafeGalleryPath);
+                        string filePath = $"{homecafeGalleryPath}/{resKey}.xml";
+                        if (File.Exists(filePath))
+                        {
+                            LoggerAccessor.LogInfo($"[PREMIUMAGENCY] - Resource with resource key {resKey} found and sent!");
+                            string res = File.ReadAllText(filePath);
+
+                            string resourceXML = "<xml>\r\n" +
+                                "<result type=\"int\">1</result>\r\n" +
+                                "<description type=\"text\">Success</description>\r\n" +
+                                "<error_no type=\"int\">0</error_no>\r\n" +
+                                "<error_message type=\"text\">None</error_message>\r\n" +
+                                $"<key type=\"text\">{resKey}</key>\r\n" +
+                                $"{res}\r\n" +
+                                "</xml>";
+
+                            return resourceXML;
+                        }
+                        else
+                        {
+                            LoggerAccessor.LogError($"[PREMIUMAGENCY] - Failed to find resource {resKey} with expected path {filePath}!");
+                        }
+                    }
+                    break;
                 case "hc_gallery":
                     {
                         Directory.CreateDirectory(homecafeGalleryPath);
@@ -1581,9 +1633,8 @@ namespace WebAPIService.GameServices.PSHOME.PREMIUMAGENCY
                         }
                     }
                     break;
-                #endregion
-
-                #region Homecafe Event Item Shop
+                #endregion    
+				#region Homecafe Event Item Shop
                 case "hc_shop":
                     {
                         Directory.CreateDirectory(homecafeShopPath);
