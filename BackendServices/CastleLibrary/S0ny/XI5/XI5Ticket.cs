@@ -214,7 +214,13 @@ namespace CastleLibrary.S0ny.XI5
                     ticket.Valid = isValidTimestamp && isValidServiceId && ECDsaRPCN.VerifySignature(ticket.HashedMessage, ((DerInteger)seq[0]).Value, ((DerInteger)seq[1]).Value);
                 }
             }
-            else if (ticket.SignatureData.Length == 56)
+            else if (isVer40) // TODO, figuring out the 4.0 hash algorithm.
+            {
+                // unhandled!!!
+
+                ticket.Valid = isValidTimestamp && isValidServiceId;
+            }
+            else
             {
                 List<ITicketPublicSigningKey> psnSigningKeys = null;
 
@@ -244,14 +250,6 @@ namespace CastleLibrary.S0ny.XI5
                            SigningKeyResolver.VerifyTicketSignature(ticket.HashedMessage, key.PemStr, seq)));
                 }
             }
-            else if (isVer40 && ticket.SignatureData.Length == 32) // TODO, figuring out the 4.0 hash algorithm.
-            {
-                // unhandled!!!
-
-                ticket.Valid = isValidTimestamp && isValidServiceId;
-            }
-            else
-                throw new FormatException($"[XI5Ticket] - Unknown Signature data.");
 
             if (!isValidTimestamp)
             {
